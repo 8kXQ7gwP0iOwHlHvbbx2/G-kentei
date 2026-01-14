@@ -2,66 +2,63 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G検定 自作問題集 - 復習&グラフ機能</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G検定 学習システム</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; max-width: 600px; width: 100%; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; }
-        .q-id { color: #007bff; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
-        .q-text { font-size: 1.1em; font-weight: bold; margin-bottom: 20px; line-height: 1.4; }
-        .opt-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; text-align: left; font-size: 16px; transition: 0.2s; }
-        .opt-btn:hover:not(:disabled) { background: #f0f0f0; }
-        .res-area { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; line-height: 1.6; border: 1px solid #ccc; }
-        .correct { background: #d4edda; color: #155724; border-color: #c3e6cb; }
-        .wrong { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
-        button.primary-btn { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        .nav-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+        /* iPhone向けの調整 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; max-width: 500px; width: 100%; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
         
-        /* グラフ用オーバーレイ */
-        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100; justify-content:center; align-items:center; }
-        .chart-modal { background:white; padding:20px; border-radius:12px; width:90%; max-width:400px; text-align:center; }
+        .nav-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .score-info { font-weight: bold; color: #555; font-size: 0.9em; }
         
-        .badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
-        .badge-wrong { background: #dc3545; color: white; }
+        /* ボタンをiPhoneで押しやすいサイズに (最小44px) */
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; touch-action: manipulation; }
+        .sub-btn { font-size: 0.75em; padding: 8px 12px; background: #fff; border: 1px solid #ddd; margin-left: 5px; }
+        .primary-btn { width: 100%; padding: 16px; background: #333; color: white; margin-top: 15px; font-size: 1em; }
+        
+        .q-text { font-size: 1.1em; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
+        .opt-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #e0e0e0; border-radius: 10px; background: #fff; text-align: left; font-size: 16px; line-height: 1.4; }
+        .opt-btn:active { background: #ebebeb; }
+
+        .res-area { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; font-size: 0.95em; }
+        .correct { background: #e6f4ea; color: #1e7e34; }
+        .wrong { background: #fdf2f2; color: #9b1c1c; }
+        
+        .link-btn { display: block; text-align: center; margin-top: 12px; padding: 12px; background: #4285F4; color: white; text-decoration: none; border-radius: 8px; font-size: 0.9em; }
+
+        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
+        .chart-modal { background:white; padding:20px; border-radius:16px; width:85%; text-align:center; }
+        
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 16px; -webkit-appearance: none; background: #fff; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="nav-header">
-        <div class="score-info">問題: <span id="current-count">0</span> / <span id="total-count">0</span></div>
-        <div style="display: flex; gap: 5px;">
-            <button onclick="toggleChart()" style="font-size: 0.7em; padding: 4px 8px; border-radius: 4px; border: 1px solid #28a745; background: #fff; color: #28a745; cursor: pointer;">成績グラフ</button>
-            <button onclick="resetProgress()" style="font-size: 0.7em; padding: 4px 8px; border-radius: 4px; border: 1px solid #dc3545; background: #fff; color: #dc3545; cursor: pointer;">リセット</button>
+        <div class="score-info">Q <span id="current-count">0</span> / <span id="total-count">0</span></div>
+        <div>
+            <button onclick="toggleChart()" class="sub-btn" style="color:#28a745">成績</button>
+            <button onclick="resetProgress()" class="sub-btn" style="color:#dc3545">リセット</button>
         </div>
     </div>
 
-    <div id="review-banner" style="display:none; background:#fff3cd; padding:10px; margin-bottom:15px; border-radius:6px; font-size:0.9em; color:#856404; text-align:center;">
-        ⚠️ <strong>不正解問題の復習中</strong> (<span id="wrong-remaining">0</span>問)
-        <button onclick="exitReview()" style="margin-left:10px; cursor:pointer;">復習を終了</button>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-        <select id="category-jump" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-            <option value="">▼ カテゴリからジャンプ</option>
-        </select>
-    </div>
+    <select id="category-jump"></select>
 
     <div id="quiz-ui">
-        <div id="display-id" class="q-id"></div>
+        <div id="display-id" style="font-size:0.8em; color:#007bff; margin-bottom:5px;"></div>
         <div id="display-text" class="q-text">読み込み中...</div>
         <div id="options-area"></div>
         <div id="display-result" class="res-area"></div>
         <button id="next-btn" class="primary-btn" style="display:none;">次の問題へ</button>
-        <button id="review-wrong-btn" class="primary-btn" style="display:none; background:#dc3545;">間違えた問題だけ解き直す</button>
     </div>
 
     <div id="result-ui" style="display:none; text-align:center;">
         <h2>終了！</h2>
-        <p id="final-score" style="font-size: 1.5em; font-weight: bold;"></p>
-        <button id="final-review-btn" class="primary-btn" style="background:#dc3545; margin-bottom:10px;">間違えた問題を復習する</button>
-        <button onclick="resetProgress()" class="primary-btn" style="background:#007bff;">記録を消して最初から解く</button>
+        <p id="final-score"></p>
+        <button onclick="resetProgress()" class="primary-btn">最初から解く</button>
     </div>
 </div>
 
@@ -69,19 +66,16 @@
     <div class="chart-modal" onclick="event.stopPropagation()">
         <h3>現在の成績</h3>
         <canvas id="accuracyChart"></canvas>
-        <button onclick="toggleChart()" style="margin-top:15px; padding:8px 20px; cursor:pointer;">閉じる</button>
+        <button onclick="toggleChart()" class="primary-btn" style="background:#666">閉じる</button>
     </div>
 </div>
 
 <script>
-    const SAVE_KEY = 'g_kentei_v3_progress';
+    const SAVE_KEY = 'g_kentei_iphone_v1';
     let allData = [];
     let currentIdx = 0;
     let correctCount = 0;
     let answeredCount = 0;
-    let wrongList = []; // 不正解問のIDリスト
-    let isReviewMode = false;
-    let reviewIdx = 0;
     let myChart = null;
 
     fetch('quizData.json')
@@ -89,178 +83,105 @@
         .then(data => {
             allData = data;
             document.getElementById('total-count').innerText = allData.length;
-            generateCategoryMenu(data);
-            loadProgress();
-            showQuestion();
+            
+            // 目次作成
+            const select = document.getElementById('category-jump');
+            select.innerHTML = '<option value="">▼ カテゴリ移動</option>';
+            [...new Set(data.map(i => i.Category))].forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = data.findIndex(i => i.Category === cat);
+                opt.innerText = cat;
+                select.appendChild(opt);
+            });
+            select.onchange = (e) => { if(e.target.value !== "") { currentIdx = parseInt(e.target.value); show(); } };
+
+            load();
+            show();
         });
 
-    function generateCategoryMenu(data) {
-        const select = document.getElementById('category-jump');
-        const categories = [...new Set(data.map(item => item.Category))];
-        categories.forEach(cat => {
-            const firstIdx = data.findIndex(item => item.Category === cat);
-            const option = document.createElement('option');
-            option.value = firstIdx;
-            option.innerText = cat;
-            select.appendChild(option);
-        });
-        select.onchange = (e) => {
-            if(e.target.value !== "") {
-                isReviewMode = false;
-                currentIdx = parseInt(e.target.value);
-                saveProgress();
-                showQuestion();
-            }
-        };
-    }
-
-    function showQuestion() {
-        const item = isReviewMode ? allData.find(d => d.ID === wrongList[reviewIdx]) : allData[currentIdx];
-        if (!item) return exitReview();
-
-        document.getElementById('review-banner').style.display = isReviewMode ? 'block' : 'none';
-        if(isReviewMode) document.getElementById('wrong-remaining').innerText = wrongList.length - reviewIdx;
-
-        document.getElementById('current-count').innerText = isReviewMode ? "復習" : currentIdx + 1;
-        document.getElementById('display-id').innerText = `[${item.Category}] ${item.ID}`;
+    function show() {
+        const item = allData[currentIdx];
+        document.getElementById('current-count').innerText = currentIdx + 1;
+        document.getElementById('display-id').innerText = item.ID;
         document.getElementById('display-text').innerText = item.Question;
         document.getElementById('display-result').style.display = 'none';
         document.getElementById('next-btn').style.display = 'none';
         
-        const optArea = document.getElementById('options-area');
-        optArea.innerHTML = '';
-        const options = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
-
-        options.forEach((txt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = txt;
-            btn.onclick = () => checkAnswer(idx, item);
-            optArea.appendChild(btn);
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        const opts = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
+        opts.forEach((txt, idx) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = txt;
+            b.onclick = () => check(idx, item);
+            area.appendChild(b);
         });
     }
-function checkAnswer(idx, item) {
-        const resArea = document.getElementById('display-result');
-        const btns = document.querySelectorAll('.opt-btn');
-        btns.forEach(b => b.disabled = true);
+
+    function check(idx, item) {
+        const res = document.getElementById('display-result');
+        document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
 
         const isCorrect = (idx === item.Answer_Idx);
         if (isCorrect) {
-            if(!isReviewMode) correctCount++;
-            resArea.className = 'res-area correct';
-            resArea.innerHTML = `<strong>✨ 正解！</strong><br>${item.Explanation}`;
+            correctCount++;
+            res.className = 'res-area correct';
+            res.innerHTML = `<b>正解！</b><br>${item.Explanation}`;
         } else {
-            resArea.className = 'res-area wrong';
-            const options = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
-            resArea.innerHTML = `<strong>❌ 不正解...</strong> (正解: ${options[item.Answer_Idx]})<br>${item.Explanation}`;
-            if(!wrongList.includes(item.ID)) wrongList.push(item.ID);
+            res.className = 'res-area wrong';
+            const opts = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
+            res.innerHTML = `<b>不正解...</b> (正解: ${opts[item.Answer_Idx]})<br>${item.Explanation}`;
         }
 
-        // --- 今回の修正ポイント：JSONのLinkを無視してGoogle検索ボタンを作成 ---
-        // 検索クエリを「G検定 ＋ 問題文」にして精度を高めます
-        const searchQuery = encodeURIComponent("G検定 " + item.Question);
-        const searchUrl = `https://www.google.com/search?q=${searchQuery}`;
-        
-        resArea.innerHTML += `<br><a href="${searchUrl}" target="_blank" class="link-btn" style="background:#4285F4;">🔍 Googleでこの問題を検索 (別タブ)</a>`;
-        // ------------------------------------------------------------------
+        // Google検索ボタンを追加（iPhoneで調べやすいように）
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent("G検定 " + item.Question)}`;
+        res.innerHTML += `<a href="${searchUrl}" target="_blank" class="link-btn">🔍 Googleで詳しく調べる</a>`;
 
-        if(!isReviewMode) answeredCount++;
-        resArea.style.display = 'block';
+        answeredCount++;
+        res.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
-        if(!isReviewMode && wrongList.length > 0) document.getElementById('review-wrong-btn').style.display = 'block';
-        saveProgress();
+        save();
     }
+
     document.getElementById('next-btn').onclick = () => {
-        document.getElementById('review-wrong-btn').style.display = 'none';
-        if (isReviewMode) {
-            reviewIdx++;
-            if (reviewIdx < wrongList.length) showQuestion();
-            else exitReview();
-        } else {
-            currentIdx++;
-            if (currentIdx < allData.length) showQuestion();
-            else showFinalResult();
-        }
+        currentIdx++;
+        if (currentIdx < allData.length) show(); else showResult();
     };
 
-    function startReview() {
-        if(wrongList.length === 0) return alert("復習する問題がありません！");
-        isReviewMode = true;
-        reviewIdx = 0;
-        document.getElementById('result-ui').style.display = 'none';
-        document.getElementById('quiz-ui').style.display = 'block';
-        showQuestion();
-    }
-
-    document.getElementById('review-wrong-btn').onclick = startReview;
-    document.getElementById('final-review-btn').onclick = startReview;
-
-    function exitReview() {
-        isReviewMode = false;
-        alert("通常の学習モードに戻ります。");
-        showQuestion();
-    }
-
-    // グラフ表示の切り替え
     function toggleChart() {
-        const overlay = document.getElementById('chart-overlay');
-        if (overlay.style.display === 'flex') {
-            overlay.style.display = 'none';
-        } else {
-            overlay.style.display = 'flex';
-            renderChart();
-        }
-    }
-
-    function renderChart() {
-        const ctx = document.getElementById('accuracyChart').getContext('2d');
-        const rate = answeredCount > 0 ? Math.round((correctCount/answeredCount)*100) : 0;
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['正解', '不正解'],
-                datasets: [{
-                    data: [correctCount, answeredCount - correctCount],
-                    backgroundColor: ['#28a745', '#dc3545']
-                }]
-            },
-            options: {
-                plugins: {
-                    title: { display: true, text: `累積正解率: ${rate}% (回答数: ${answeredCount})` }
+        const o = document.getElementById('chart-overlay');
+        o.style.display = (o.style.display === 'flex') ? 'none' : 'flex';
+        if (o.style.display === 'flex') {
+            const ctx = document.getElementById('accuracyChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['正解', '不正解'],
+                    datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#28a745', '#dc3545'] }]
                 }
-            }
-        });
-    }
-
-    function saveProgress() {
-        const data = { index: currentIdx, correct: correctCount, answered: answeredCount, wrongs: wrongList };
-        localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    }
-
-    function loadProgress() {
-        const saved = localStorage.getItem(SAVE_KEY);
-        if (saved) {
-            const data = JSON.parse(saved);
-            currentIdx = data.index || 0;
-            correctCount = data.correct || 0;
-            answeredCount = data.answered || 0;
-            wrongList = data.wrongs || [];
+            });
         }
+    }
+
+    function save() {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount }));
+    }
+
+    function load() {
+        const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+        if (s) { currentIdx = s.i; correctCount = s.c; answeredCount = s.a; }
     }
 
     function resetProgress() {
-        if (confirm("全ての記録（不正解リスト含む）を消去しますか？")) {
-            localStorage.removeItem(SAVE_KEY);
-            location.reload();
-        }
+        if (confirm("リセットしますか？")) { localStorage.removeItem(SAVE_KEY); location.reload(); }
     }
 
-    function showFinalResult() {
+    function showResult() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
-        document.getElementById('final-score').innerText = `${allData.length}問中 ${correctCount}問正解！`;
-        document.getElementById('final-review-btn').style.display = wrongList.length > 0 ? 'block' : 'none';
+        document.getElementById('final-score').innerText = `${answeredCount}問中 ${correctCount}問正解`;
     }
 </script>
 </body>
