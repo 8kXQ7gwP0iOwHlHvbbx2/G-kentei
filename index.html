@@ -6,7 +6,6 @@
     <title>G検定 学習システム</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 全体設定 */
         :root {
             --primary-color: #1a73e8;
             --danger-color: #e53e3e;
@@ -23,7 +22,6 @@
             flex-direction: column; 
             align-items: center; 
             color: #333;
-            -webkit-font-smoothing: antialiased;
         }
 
         .card { 
@@ -34,163 +32,63 @@
             border-radius: 20px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
             box-sizing: border-box; 
-            position: relative;
             margin-top: 10px;
         }
         
-        /* ヘッダー：PCとスマホで柔軟に並び替え */
-        .nav-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            gap: 10px;
-            flex-wrap: wrap; /* 文字切れ防止：並びきれない場合は折り返す */
-        }
-
-        .score-info { 
-            font-weight: bold; 
-            color: #666; 
-            font-size: 0.9rem; 
-            min-width: fit-content;
-        }
-
-        .header-btns { 
-            display: flex; 
-            gap: 6px; 
-            flex-wrap: wrap; /* Windowsブラウザでの文字切れを徹底防止 */
-        }
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
+        .score-info { font-weight: bold; color: #666; font-size: 0.9rem; white-space: nowrap; }
+        .header-btns { display: flex; gap: 6px; flex-wrap: wrap; }
         
-        /* ボタン共通設定 */
-        button { 
-            cursor: pointer; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            border: none; 
-            touch-action: manipulation; 
-            transition: background 0.2s; 
-            white-space: nowrap;
-            padding: 8px 12px;
-            font-size: 0.8rem;
-        }
-        
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; touch-action: manipulation; transition: 0.2s; white-space: nowrap; padding: 8px 12px; font-size: 0.8rem; }
         .sub-btn { background: #fff; border: 1px solid #ddd; color: #555; }
-        .sub-btn:hover { background: #f8f9fa; }
         .shuffle-btn { background: #6c757d; color: white; }
-        .shuffle-btn:hover { background: #5a6268; }
 
-        .primary-btn { 
-            width: 100%; 
-            padding: 16px; 
-            background: #333; 
-            color: white; 
-            margin-top: 15px; 
-            font-size: 1rem; 
-            border-radius: 12px;
-        }
-        .primary-btn:hover { background: #000; }
+        .primary-btn { width: 100%; padding: 16px; background: #333; color: white; margin-top: 15px; font-size: 1rem; border-radius: 12px; }
         .review-btn { background: var(--danger-color) !important; }
 
-        /* クイズコンテンツ */
-        .q-text { 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            margin-bottom: 25px; 
-            line-height: 1.6; 
-            word-wrap: break-word; /* 長い単語の改行対応 */
-        }
+        .q-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 25px; line-height: 1.6; word-wrap: break-word; }
+        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; background: #fff; text-align: left; font-size: 1rem; color: #444; }
 
-        .opt-btn { 
-            display: block; 
-            width: 100%; 
-            padding: 16px; 
-            margin-bottom: 12px; 
-            border: 1px solid #eee; 
-            border-radius: 12px; 
-            background: #fff; 
-            text-align: left; 
-            font-size: 1rem; 
-            line-height: 1.4; 
-            color: #444; 
-            transition: all 0.2s;
-        }
-        .opt-btn:hover:not(:disabled) { border-color: var(--primary-color); background: #f1f7ff; }
-        .opt-btn:active { transform: scale(0.99); }
-
-        /* 結果エリア */
-        .res-area { 
-            margin-top: 20px; 
-            padding: 20px; 
-            border-radius: 12px; 
-            display: none; 
-            font-size: 0.95rem; 
-            line-height: 1.6; 
-            border-left: 6px solid; 
-        }
+        .res-area { margin-top: 20px; padding: 20px; border-radius: 12px; display: none; font-size: 0.95rem; line-height: 1.6; border-left: 6px solid; }
         .correct { background: #f0fff4; color: #22543d; border-color: var(--success-color); }
         .wrong { background: #fff5f5; color: #822727; border-color: var(--danger-color); }
         
-        .ai-btn { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin-top: 15px; 
-            padding: 14px; 
-            background: var(--primary-color); 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 10px; 
-            font-size: 0.95rem; 
-            font-weight: bold;
-        }
+        .ai-btn { display: flex; align-items: center; justify-content: center; margin-top: 15px; padding: 14px; background: var(--primary-color); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
 
-        /* 復習バナー */
-        #review-banner { 
-            display:none; 
-            background:#fff3cd; 
-            padding:12px; 
-            margin-bottom:15px; 
-            border-radius:10px; 
-            font-size:0.85rem; 
-            color:#856404; 
-            text-align:center; 
-            border: 1px solid #ffeeba; 
-        }
-        
-        /* セレクトボックス */
-        select { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 10px; 
-            border: 1px solid #ddd; 
-            margin-bottom: 20px; 
-            font-size: 1rem; 
-            background: #fff; 
-            cursor: pointer;
-        }
-
-        /* グラフ・モーダル */
+        /* --- 成績画面（モーダル）のレスポンシブ修正 --- */
         #chart-overlay { 
             display:none; 
             position:fixed; 
             top:0; left:0; width:100%; height:100%; 
             background:rgba(0,0,0,0.8); 
             z-index:1000; 
-            justify-content:center; align-items:center; 
-        }
-        .chart-modal { 
-            background:white; 
-            padding:30px; 
-            border-radius:24px; 
-            width:90%; 
-            max-width:400px; 
-            text-align:center; 
-            box-sizing: border-box; 
+            justify-content:center; 
+            align-items:center;
+            padding: 20px; /* 外側の余白 */
+            box-sizing: border-box;
         }
 
-        /* レスポンシブ調整：画面幅が狭い場合 */
+        .chart-modal { 
+            background:white; 
+            padding:clamp(20px, 5vw, 30px); 
+            border-radius:24px; 
+            width: 100%;
+            max-width: 450px; /* PCでの最大幅 */
+            max-height: 90vh; /* 画面を突き抜けないように */
+            overflow-y: auto; /* 内容が多い場合はスクロール */
+            text-align:center; 
+            box-sizing: border-box; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 250px; /* グラフの高さ */
+            width: 100%;
+        }
+
         @media screen and (max-width: 400px) {
-            .nav-header { flex-direction: column; align-items: flex-start; }
             .header-btns { width: 100%; justify-content: space-between; }
             .sub-btn, .shuffle-btn { flex: 1; text-align: center; }
         }
@@ -200,239 +98,128 @@
 
 <div class="card">
     <div class="nav-header">
-        <div class="score-info">進捗: <span id="current-count">0</span> / <span id="total-count">0</span></div>
+        <div class="score-info">Q <span id="current-count">0</span> / <span id="total-count">0</span></div>
         <div class="header-btns">
-            <button onclick="shuffleRemaining()" class="shuffle-btn">🔀 シャッフル</button>
+            <button onclick="shuffleRemaining()" class="shuffle-btn">🔀 並び替え</button>
             <button onclick="toggleChart()" class="sub-btn" style="color:var(--success-color)">成績</button>
             <button onclick="resetProgress()" class="sub-btn" style="color:var(--danger-color)">リセット</button>
         </div>
     </div>
 
-    <div id="review-banner">
-        ⚠️ <b>復習モード</b> (残り <span id="wrong-count-display">0</span>問)
-        <button onclick="exitReview()" style="background:none; color:var(--primary-color); text-decoration:underline; font-size:1em; margin-left:10px;">通常へ</button>
-    </div>
-
     <select id="category-jump"></select>
-
     <div id="quiz-ui">
         <div id="display-id" style="font-size:0.8rem; color:var(--primary-color); margin-bottom:8px; font-weight:bold;"></div>
-        <div id="display-text" class="q-text">データを読み込み中...</div>
+        <div id="display-text" class="q-text">読み込み中...</div>
         <div id="options-area"></div>
         <div id="display-result" class="res-area"></div>
         <button id="next-btn" class="primary-btn" style="display:none;">次の問題へ</button>
-        <button id="start-review-btn" class="primary-btn review-btn" style="display:none;">間違えた問題を解き直す</button>
+        <button id="start-review-btn" class="primary-btn review-btn" style="display:none;">間違えた問題を解く</button>
     </div>
-
     <div id="result-ui" style="display:none; text-align:center;">
-        <h2 style="font-size:1.5rem; margin-bottom:10px;">学習完了！</h2>
-        <p id="final-score" style="font-size:1.1rem; color:#555; margin-bottom:25px;"></p>
-        <button id="final-review-btn" class="primary-btn review-btn" style="margin-bottom:10px;">間違えた問題を復習</button>
-        <button onclick="resetProgress()" class="primary-btn" style="background:var(--primary-color);">最初から解く</button>
+        <h2>学習完了！</h2>
+        <p id="final-score"></p>
+        <button id="final-review-btn" class="primary-btn review-btn">復習する</button>
+        <button onclick="resetProgress()" class="primary-btn" style="background:var(--primary-color);">最初から</button>
     </div>
 </div>
 
 <div id="chart-overlay" onclick="toggleChart()">
     <div class="chart-modal" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0;">学習データ分析</h3>
-        <canvas id="accuracyChart"></canvas>
+        <h3 style="margin-top:0;">現在の正解率</h3>
+        <div class="chart-container">
+            <canvas id="accuracyChart"></canvas>
+        </div>
+        <div id="score-text-detail" style="margin-top:15px; font-weight:bold; color:#666;"></div>
         <button onclick="toggleChart()" class="primary-btn" style="background:#666; margin-top:20px;">閉じる</button>
     </div>
 </div>
 
 <script>
+    /* JavaScriptロジックは前回分を継承しつつ、グラフのレスポンシブ設定を追加 */
     const SAVE_KEY = 'g_kentei_v_responsive_final';
-    let rawData = [];
-    let activeQuizList = [];
-    let currentIdx = 0;
-    let correctCount = 0;
-    let answeredCount = 0;
-    let wrongList = [];
-    let isReviewMode = false;
-    let reviewIdx = 0;
-    let myChart = null;
+    let rawData = [], activeQuizList = [], currentIdx = 0, correctCount = 0, answeredCount = 0, wrongList = [], isReviewMode = false, reviewIdx = 0, myChart = null;
 
-    // JSONデータのフェッチ
-    fetch('quizData.json')
-        .then(res => res.json())
-        .then(data => {
-            rawData = data;
-            activeQuizList = [...data];
-            document.getElementById('total-count').innerText = activeQuizList.length;
-            
-            const select = document.getElementById('category-jump');
-            select.innerHTML = '<option value="">▼ カテゴリから選ぶ</option>';
-            [...new Set(data.map(i => i.Category))].forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.innerText = cat;
-                select.appendChild(opt);
-            });
-            select.onchange = (e) => { 
-                if(e.target.value !== "") {
-                    isReviewMode = false;
-                    activeQuizList = rawData.filter(item => item.Category === e.target.value);
-                    currentIdx = 0;
-                    show();
-                } 
-            };
-            load();
-            show();
+    fetch('quizData.json').then(res => res.json()).then(data => {
+        rawData = data; activeQuizList = [...data];
+        document.getElementById('total-count').innerText = activeQuizList.length;
+        const select = document.getElementById('category-jump');
+        select.innerHTML = '<option value="">▼ カテゴリから選ぶ</option>';
+        [...new Set(data.map(i => i.Category))].forEach(cat => {
+            const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat; select.appendChild(opt);
         });
+        select.onchange = (e) => { if(e.target.value !== "") { isReviewMode = false; activeQuizList = rawData.filter(item => item.Category === e.target.value); currentIdx = 0; show(); } };
+        load(); show();
+    });
 
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function shuffleRemaining() {
-        if (isReviewMode) {
-            shuffleArray(wrongList);
-            reviewIdx = 0;
-        } else {
-            const done = activeQuizList.slice(0, currentIdx);
-            const remaining = activeQuizList.slice(currentIdx);
-            activeQuizList = done.concat(shuffleArray(remaining));
-        }
-        alert("残りの問題をシャッフルしました。");
-        show();
-    }
+    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+    function shuffleRemaining() { if (isReviewMode) { shuffleArray(wrongList); reviewIdx = 0; } else { const done = activeQuizList.slice(0, currentIdx); const remaining = activeQuizList.slice(currentIdx); activeQuizList = done.concat(shuffleArray(remaining)); } alert("シャッフル完了！"); show(); }
 
     function show() {
         const item = isReviewMode ? rawData.find(d => d.ID === wrongList[reviewIdx]) : activeQuizList[currentIdx];
-        if (!item) {
-            if(isReviewMode) return exitReview();
-            return showResult();
-        }
-        document.getElementById('review-banner').style.display = isReviewMode ? 'block' : 'none';
-        if(isReviewMode) document.getElementById('wrong-count-display').innerText = wrongList.length - reviewIdx;
-
+        if (!item) return isReviewMode ? exitReview() : showResult();
         document.getElementById('current-count').innerText = isReviewMode ? `復習 ${reviewIdx+1}` : currentIdx + 1;
-        document.getElementById('total-count').innerText = isReviewMode ? wrongList.length : activeQuizList.length;
         document.getElementById('display-id').innerText = item.ID + " [" + item.Category + "]";
         document.getElementById('display-text').innerText = item.Question;
         document.getElementById('display-result').style.display = 'none';
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('start-review-btn').style.display = 'none';
-        
-        const area = document.getElementById('options-area');
-        area.innerHTML = '';
+        const area = document.getElementById('options-area'); area.innerHTML = '';
         const opts = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
         opts.forEach((txt, idx) => {
-            const b = document.createElement('button');
-            b.className = 'opt-btn';
-            b.innerText = txt;
-            b.onclick = () => check(idx, item);
-            area.appendChild(b);
+            const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = txt; b.onclick = () => check(idx, item); area.appendChild(b);
         });
     }
 
     function check(idx, item) {
         const res = document.getElementById('display-result');
         document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
-
         if (idx === item.Answer_Idx) {
             if(!isReviewMode) correctCount++;
-            res.className = 'res-area correct';
-            res.innerHTML = `<b>✨ 正解です！</b><br>${item.Explanation}`;
+            res.className = 'res-area correct'; res.innerHTML = `<b>✨ 正解です！</b><br>${item.Explanation}`;
         } else {
             res.className = 'res-area wrong';
             const opts = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
             res.innerHTML = `<b>❌ 不正解...</b> (正解: ${opts[item.Answer_Idx]})<br>${item.Explanation}`;
             if(!wrongList.includes(item.ID)) wrongList.push(item.ID);
         }
-
-        const prompt = `G検定の勉強をしています。以下の問題の正解の理由と関連用語を詳しく解説してください。\n\n【問題】\n${item.Question}\n\n【正解の解説】\n${item.Explanation}`;
+        const prompt = `G検定の勉強中です。解説してください。\n\n【問題】\n${item.Question}\n\n【解説】\n${item.Explanation}`;
         res.innerHTML += `<a href="https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}" target="_blank" class="ai-btn">✨ Geminiで詳しく解説</a>`;
-
         if(!isReviewMode) answeredCount++;
-        res.style.display = 'block';
-        document.getElementById('next-btn').style.display = 'block';
+        res.style.display = 'block'; document.getElementById('next-btn').style.display = 'block';
         if(!isReviewMode && wrongList.length > 0) document.getElementById('start-review-btn').style.display = 'block';
         save();
     }
 
-    document.getElementById('next-btn').onclick = () => {
-        if (isReviewMode) {
-            reviewIdx++;
-            if (reviewIdx < wrongList.length) show(); else exitReview();
-        } else {
-            currentIdx++;
-            if (currentIdx < activeQuizList.length) show(); else showResult();
-        }
-    };
-
-    function startReview() {
-        if(wrongList.length === 0) return;
-        isReviewMode = true;
-        reviewIdx = 0;
-        shuffleArray(wrongList);
-        document.getElementById('result-ui').style.display = 'none';
-        document.getElementById('quiz-ui').style.display = 'block';
-        show();
-    }
-
-    function exitReview() {
-        isReviewMode = false;
-        show();
-    }
+    document.getElementById('next-btn').onclick = () => { if (isReviewMode) { reviewIdx++; if (reviewIdx < wrongList.length) show(); else exitReview(); } else { currentIdx++; if (currentIdx < activeQuizList.length) show(); else showResult(); } };
+    function startReview() { if(wrongList.length === 0) return; isReviewMode = true; reviewIdx = 0; shuffleArray(wrongList); document.getElementById('result-ui').style.display = 'none'; document.getElementById('quiz-ui').style.display = 'block'; show(); }
+    function exitReview() { isReviewMode = false; show(); }
 
     function toggleChart() {
         const o = document.getElementById('chart-overlay');
         o.style.display = (o.style.display === 'flex') ? 'none' : 'flex';
         if (o.style.display === 'flex') {
             const ctx = document.getElementById('accuracyChart').getContext('2d');
+            document.getElementById('score-text-detail').innerText = `正解数: ${correctCount} / 解いた数: ${answeredCount}`;
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['正解', '不正解'],
-                    datasets: [{ 
-                        data: [correctCount, answeredCount - correctCount], 
-                        backgroundColor: ['#38a169', '#e53e3e'],
-                        borderWidth: 0 
-                    }]
+                    datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#38a169', '#e53e3e'], borderWidth: 0 }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false, // コンテナの高さに合わせる
                     plugins: { legend: { position: 'bottom' } }
                 }
             });
         }
     }
 
-    function save() {
-        localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount, w: wrongList, list: activeQuizList }));
-    }
-
-    function load() {
-        const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-        if (s) { 
-            currentIdx = s.i || 0; 
-            correctCount = s.c || 0; 
-            answeredCount = s.a || 0; 
-            wrongList = s.w || []; 
-            if(s.list) activeQuizList = s.list;
-        }
-    }
-
-    function resetProgress() {
-        if (confirm("これまでの学習進捗、並び替え順序、不正解リストをすべて消去しますか？")) { 
-            localStorage.removeItem(SAVE_KEY); 
-            location.reload(); 
-        }
-    }
-
-    function showResult() {
-        document.getElementById('quiz-ui').style.display = 'none';
-        document.getElementById('result-ui').style.display = 'block';
-        document.getElementById('final-score').innerText = `${answeredCount}問中 ${correctCount}問正解しました！`;
-        document.getElementById('final-review-btn').style.display = wrongList.length > 0 ? 'inline-block' : 'none';
-    }
-
+    function save() { localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount, w: wrongList, list: activeQuizList })); }
+    function load() { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) { currentIdx = s.i || 0; correctCount = s.c || 0; answeredCount = s.a || 0; wrongList = s.w || []; if(s.list) activeQuizList = s.list; } }
+    function resetProgress() { if (confirm("リセットしますか？")) { localStorage.removeItem(SAVE_KEY); location.reload(); } }
+    function showResult() { document.getElementById('quiz-ui').style.display = 'none'; document.getElementById('result-ui').style.display = 'block'; document.getElementById('final-score').innerText = `${answeredCount}問中 ${correctCount}問正解！`; }
     document.getElementById('start-review-btn').onclick = startReview;
     document.getElementById('final-review-btn').onclick = startReview;
 </script>
