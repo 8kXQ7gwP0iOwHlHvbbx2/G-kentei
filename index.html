@@ -3,35 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>G検定 学習システム</title>
+    <title>G検定 最強学習システム</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* iPhone向けの調整 */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: white; max-width: 500px; width: 100%; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; color: #333; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; max-width: 500px; width: 100%; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; position: relative; }
         
         .nav-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .score-info { font-weight: bold; color: #555; font-size: 0.9em; }
+        .score-info { font-weight: bold; color: #666; font-size: 0.9em; }
         
-        /* ボタンをiPhoneで押しやすいサイズに (最小44px) */
-        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; touch-action: manipulation; }
+        button { cursor: pointer; border-radius: 10px; font-weight: bold; border: none; touch-action: manipulation; transition: 0.2s; }
         .sub-btn { font-size: 0.75em; padding: 8px 12px; background: #fff; border: 1px solid #ddd; margin-left: 5px; }
         .primary-btn { width: 100%; padding: 16px; background: #333; color: white; margin-top: 15px; font-size: 1em; }
-        
-        .q-text { font-size: 1.1em; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
-        .opt-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #e0e0e0; border-radius: 10px; background: #fff; text-align: left; font-size: 16px; line-height: 1.4; }
-        .opt-btn:active { background: #ebebeb; }
+        .review-btn { background: #e63946 !important; }
+        /* シャッフルボタン専用スタイル */
+        .shuffle-btn { background: #6c757d; color: white; font-size: 0.75em; padding: 8px 12px; border-radius: 10px; margin-left: 5px; }
 
-        .res-area { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; font-size: 0.95em; }
-        .correct { background: #e6f4ea; color: #1e7e34; }
-        .wrong { background: #fdf2f2; color: #9b1c1c; }
-        
-        .link-btn { display: block; text-align: center; margin-top: 12px; padding: 12px; background: #4285F4; color: white; text-decoration: none; border-radius: 8px; font-size: 0.9em; }
+        .q-text { font-size: 1.15em; font-weight: bold; margin-bottom: 20px; line-height: 1.6; }
+        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; background: #fff; text-align: left; font-size: 16px; line-height: 1.4; color: #444; }
+        .opt-btn:active { background: #f0f0f0; transform: scale(0.98); }
+        .opt-btn:disabled { opacity: 0.7; }
 
-        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; }
-        .chart-modal { background:white; padding:20px; border-radius:16px; width:85%; text-align:center; }
+        .res-area { margin-top: 15px; padding: 18px; border-radius: 12px; display: none; font-size: 0.95em; line-height: 1.6; border-left: 5px solid; }
+        .correct { background: #f0fff4; color: #22543d; border-color: #38a169; }
+        .wrong { background: #fff5f5; color: #822727; border-color: #e53e3e; }
         
-        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 16px; -webkit-appearance: none; background: #fff; }
+        .ai-btn { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; padding: 14px; background: #1a73e8; color: white; text-decoration: none; border-radius: 10px; font-size: 0.95em; font-weight: bold; }
+
+        #review-banner { display:none; background:#fff3cd; padding:12px; margin-bottom:15px; border-radius:10px; font-size:0.85em; color:#856404; text-align:center; border: 1px solid #ffeeba; }
+        
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 16px; background: #fff; -webkit-appearance: none; }
+        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; }
+        .chart-modal { background:white; padding:25px; border-radius:24px; width:85%; text-align:center; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -40,72 +43,125 @@
     <div class="nav-header">
         <div class="score-info">Q <span id="current-count">0</span> / <span id="total-count">0</span></div>
         <div>
-            <button onclick="toggleChart()" class="sub-btn" style="color:#28a745">成績</button>
-            <button onclick="resetProgress()" class="sub-btn" style="color:#dc3545">リセット</button>
+            <button onclick="shuffleRemaining()" class="shuffle-btn">🔀 並び替え</button>
+            <button onclick="toggleChart()" class="sub-btn" style="color:#38a169">成績</button>
+            <button onclick="resetProgress()" class="sub-btn" style="color:#e53e3e">リセ</button>
         </div>
+    </div>
+
+    <div id="review-banner">
+        ⚠️ <b>復習モード</b> (残り <span id="wrong-count-display">0</span>問)
+        <button onclick="exitReview()" style="background:none; color:#1a73e8; text-decoration:underline; font-size:1.1em; margin-left:10px;">通常へ</button>
     </div>
 
     <select id="category-jump"></select>
 
     <div id="quiz-ui">
-        <div id="display-id" style="font-size:0.8em; color:#007bff; margin-bottom:5px;"></div>
+        <div id="display-id" style="font-size:0.8em; color:#1a73e8; margin-bottom:8px; font-weight:bold;"></div>
         <div id="display-text" class="q-text">読み込み中...</div>
         <div id="options-area"></div>
         <div id="display-result" class="res-area"></div>
         <button id="next-btn" class="primary-btn" style="display:none;">次の問題へ</button>
+        <button id="start-review-btn" class="primary-btn review-btn" style="display:none;">間違えた問題を解き直す</button>
     </div>
 
     <div id="result-ui" style="display:none; text-align:center;">
-        <h2>終了！</h2>
-        <p id="final-score"></p>
-        <button onclick="resetProgress()" class="primary-btn">最初から解く</button>
+        <h2 style="font-size:1.6em; margin-bottom:10px;">学習完了！</h2>
+        <p id="final-score" style="font-size:1.2em; color:#555; margin-bottom:25px;"></p>
+        <button id="final-review-btn" class="primary-btn review-btn" style="margin-bottom:10px;">間違えた問題を復習</button>
+        <button onclick="resetProgress()" class="primary-btn" style="background:#1a73e8;">最初から解く</button>
     </div>
 </div>
 
 <div id="chart-overlay" onclick="toggleChart()">
     <div class="chart-modal" onclick="event.stopPropagation()">
-        <h3>現在の成績</h3>
+        <h3 style="margin-top:0;">学習状況データ</h3>
         <canvas id="accuracyChart"></canvas>
-        <button onclick="toggleChart()" class="primary-btn" style="background:#666">閉じる</button>
+        <button onclick="toggleChart()" class="primary-btn" style="background:#666; margin-top:20px;">閉じる</button>
     </div>
 </div>
 
 <script>
-    const SAVE_KEY = 'g_kentei_iphone_v1';
-    let allData = [];
+    const SAVE_KEY = 'g_kentei_v_final_shuffle';
+    let rawData = [];      // 元データ（JSONそのまま）
+    let activeQuizList = []; // 現在の出題順リスト
     let currentIdx = 0;
     let correctCount = 0;
     let answeredCount = 0;
+    let wrongList = [];
+    let isReviewMode = false;
+    let reviewIdx = 0;
     let myChart = null;
 
     fetch('quizData.json')
         .then(res => res.json())
         .then(data => {
-            allData = data;
-            document.getElementById('total-count').innerText = allData.length;
+            rawData = data;
+            activeQuizList = [...data]; // 最初はそのままの順序
+            document.getElementById('total-count').innerText = activeQuizList.length;
             
-            // 目次作成
             const select = document.getElementById('category-jump');
-            select.innerHTML = '<option value="">▼ カテゴリ移動</option>';
+            select.innerHTML = '<option value="">▼ カテゴリから選ぶ</option>';
             [...new Set(data.map(i => i.Category))].forEach(cat => {
                 const opt = document.createElement('option');
-                opt.value = data.findIndex(i => i.Category === cat);
+                opt.value = cat;
                 opt.innerText = cat;
                 select.appendChild(opt);
             });
-            select.onchange = (e) => { if(e.target.value !== "") { currentIdx = parseInt(e.target.value); show(); } };
-
+            select.onchange = (e) => { 
+                if(e.target.value !== "") {
+                    isReviewMode = false;
+                    // 指定カテゴリのみを抽出
+                    activeQuizList = rawData.filter(item => item.Category === e.target.value);
+                    currentIdx = 0;
+                    show();
+                } 
+            };
             load();
             show();
         });
 
+    // シャッフル関数 (Fisher-Yates)
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 「並び替え」ボタンクリック時の処理
+    function shuffleRemaining() {
+        if (isReviewMode) {
+            // 復習リストをシャッフル
+            shuffleArray(wrongList);
+            reviewIdx = 0;
+        } else {
+            // 現在の出題リストの「これから解く分」をシャッフル
+            const done = activeQuizList.slice(0, currentIdx);
+            const remaining = activeQuizList.slice(currentIdx);
+            activeQuizList = done.concat(shuffleArray(remaining));
+        }
+        alert("残りの問題をシャッフルしました！");
+        show();
+    }
+
     function show() {
-        const item = allData[currentIdx];
-        document.getElementById('current-count').innerText = currentIdx + 1;
-        document.getElementById('display-id').innerText = item.ID;
+        const item = isReviewMode ? rawData.find(d => d.ID === wrongList[reviewIdx]) : activeQuizList[currentIdx];
+        if (!item) {
+            if(isReviewMode) return exitReview();
+            return showResult();
+        }
+        document.getElementById('review-banner').style.display = isReviewMode ? 'block' : 'none';
+        if(isReviewMode) document.getElementById('wrong-count-display').innerText = wrongList.length - reviewIdx;
+
+        document.getElementById('current-count').innerText = isReviewMode ? `復習 ${reviewIdx+1}` : currentIdx + 1;
+        document.getElementById('total-count').innerText = isReviewMode ? wrongList.length : activeQuizList.length;
+        document.getElementById('display-id').innerText = item.ID + " [" + item.Category + "]";
         document.getElementById('display-text').innerText = item.Question;
         document.getElementById('display-result').style.display = 'none';
         document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('start-review-btn').style.display = 'none';
         
         const area = document.getElementById('options-area');
         area.innerHTML = '';
@@ -123,31 +179,52 @@
         const res = document.getElementById('display-result');
         document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
 
-        const isCorrect = (idx === item.Answer_Idx);
-        if (isCorrect) {
-            correctCount++;
+        if (idx === item.Answer_Idx) {
+            if(!isReviewMode) correctCount++;
             res.className = 'res-area correct';
-            res.innerHTML = `<b>正解！</b><br>${item.Explanation}`;
+            res.innerHTML = `<b>✨ 正解です！</b><br>${item.Explanation}`;
         } else {
             res.className = 'res-area wrong';
             const opts = item.options || [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
-            res.innerHTML = `<b>不正解...</b> (正解: ${opts[item.Answer_Idx]})<br>${item.Explanation}`;
+            res.innerHTML = `<b>❌ 不正解...</b> (正解: ${opts[item.Answer_Idx]})<br>${item.Explanation}`;
+            if(!wrongList.includes(item.ID)) wrongList.push(item.ID);
         }
 
-        // Google検索ボタンを追加（iPhoneで調べやすいように）
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent("G検定 " + item.Question)}`;
-        res.innerHTML += `<a href="${searchUrl}" target="_blank" class="link-btn">🔍 Googleで詳しく調べる</a>`;
+        const prompt = `G検定の勉強をしています。以下の問題の正解がなぜこうなるのか、わかりやすく解説してください。\n\n【問題】\n${item.Question}\n\n【正解のヒント】\n${item.Explanation}`;
+        res.innerHTML += `<a href="https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}" target="_blank" class="ai-btn">✨ Geminiに詳しく聞く</a>`;
 
-        answeredCount++;
+        if(!isReviewMode) answeredCount++;
         res.style.display = 'block';
         document.getElementById('next-btn').style.display = 'block';
+        if(!isReviewMode && wrongList.length > 0) document.getElementById('start-review-btn').style.display = 'block';
         save();
     }
 
     document.getElementById('next-btn').onclick = () => {
-        currentIdx++;
-        if (currentIdx < allData.length) show(); else showResult();
+        if (isReviewMode) {
+            reviewIdx++;
+            if (reviewIdx < wrongList.length) show(); else exitReview();
+        } else {
+            currentIdx++;
+            if (currentIdx < activeQuizList.length) show(); else showResult();
+        }
     };
+
+    function startReview() {
+        if(wrongList.length === 0) return;
+        isReviewMode = true;
+        reviewIdx = 0;
+        // 復習開始時に自動でシャッフル
+        shuffleArray(wrongList);
+        document.getElementById('result-ui').style.display = 'none';
+        document.getElementById('quiz-ui').style.display = 'block';
+        show();
+    }
+
+    function exitReview() {
+        isReviewMode = false;
+        show();
+    }
 
     function toggleChart() {
         const o = document.getElementById('chart-overlay');
@@ -159,30 +236,43 @@
                 type: 'doughnut',
                 data: {
                     labels: ['正解', '不正解'],
-                    datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#28a745', '#dc3545'] }]
+                    datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#38a169', '#e53e3e'], borderWidth: 0 }]
                 }
             });
         }
     }
 
     function save() {
-        localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount }));
+        localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount, w: wrongList, list: activeQuizList }));
     }
 
     function load() {
         const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-        if (s) { currentIdx = s.i; correctCount = s.c; answeredCount = s.a; }
+        if (s) { 
+            currentIdx = s.i || 0; 
+            correctCount = s.c || 0; 
+            answeredCount = s.a || 0; 
+            wrongList = s.w || []; 
+            if(s.list) activeQuizList = s.list;
+        }
     }
 
     function resetProgress() {
-        if (confirm("リセットしますか？")) { localStorage.removeItem(SAVE_KEY); location.reload(); }
+        if (confirm("学習記録と並び替えをリセットしますか？")) { 
+            localStorage.removeItem(SAVE_KEY); 
+            location.reload(); 
+        }
     }
 
     function showResult() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
-        document.getElementById('final-score').innerText = `${answeredCount}問中 ${correctCount}問正解`;
+        document.getElementById('final-score').innerText = `${answeredCount}問中 ${correctCount}問正解！`;
+        document.getElementById('final-review-btn').style.display = wrongList.length > 0 ? 'inline-block' : 'none';
     }
+
+    document.getElementById('start-review-btn').onclick = startReview;
+    document.getElementById('final-review-btn').onclick = startReview;
 </script>
 </body>
 </html>
