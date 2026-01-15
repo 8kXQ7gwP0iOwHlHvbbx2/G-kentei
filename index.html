@@ -9,20 +9,22 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; color: #333; -webkit-tap-highlight-color: transparent; }
         .card { background: white; max-width: 500px; width: 100%; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; position: relative; }
         
-        .nav-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .score-info { font-weight: bold; color: #666; font-size: 0.9em; }
+        /* ヘッダーのレイアウト修正 */
+        .nav-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 5px; }
+        .score-info { font-weight: bold; color: #666; font-size: 0.85em; white-space: nowrap; flex-shrink: 0; }
+        .header-btns { display: flex; gap: 4px; flex-wrap: nowrap; }
         
-        button { cursor: pointer; border-radius: 10px; font-weight: bold; border: none; touch-action: manipulation; transition: 0.2s; }
-        .sub-btn { font-size: 0.75em; padding: 8px 12px; background: #fff; border: 1px solid #ddd; margin-left: 5px; }
+        button { cursor: pointer; border-radius: 10px; font-weight: bold; border: none; touch-action: manipulation; transition: 0.2s; white-space: nowrap; }
+        
+        /* ボタンサイズの最適化 */
+        .sub-btn { font-size: 0.7em; padding: 6px 8px; background: #fff; border: 1px solid #ddd; min-width: 45px; }
+        .shuffle-btn { background: #6c757d; color: white; font-size: 0.7em; padding: 6px 8px; }
         .primary-btn { width: 100%; padding: 16px; background: #333; color: white; margin-top: 15px; font-size: 1em; }
         .review-btn { background: #e63946 !important; }
-        /* シャッフルボタン専用スタイル */
-        .shuffle-btn { background: #6c757d; color: white; font-size: 0.75em; padding: 8px 12px; border-radius: 10px; margin-left: 5px; }
 
         .q-text { font-size: 1.15em; font-weight: bold; margin-bottom: 20px; line-height: 1.6; }
         .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; background: #fff; text-align: left; font-size: 16px; line-height: 1.4; color: #444; }
         .opt-btn:active { background: #f0f0f0; transform: scale(0.98); }
-        .opt-btn:disabled { opacity: 0.7; }
 
         .res-area { margin-top: 15px; padding: 18px; border-radius: 12px; display: none; font-size: 0.95em; line-height: 1.6; border-left: 5px solid; }
         .correct { background: #f0fff4; color: #22543d; border-color: #38a169; }
@@ -35,6 +37,12 @@
         select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 16px; background: #fff; -webkit-appearance: none; }
         #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; }
         .chart-modal { background:white; padding:25px; border-radius:24px; width:85%; text-align:center; box-sizing: border-box; }
+
+        /* 極端に画面が狭いiPhone SE等向けの微調整 */
+        @media screen and (max-width: 350px) {
+            .sub-btn, .shuffle-btn { font-size: 0.65em; padding: 4px 6px; }
+            .score-info { font-size: 0.75em; }
+        }
     </style>
 </head>
 <body>
@@ -42,10 +50,10 @@
 <div class="card">
     <div class="nav-header">
         <div class="score-info">Q <span id="current-count">0</span> / <span id="total-count">0</span></div>
-        <div>
+        <div class="header-btns">
             <button onclick="shuffleRemaining()" class="shuffle-btn">🔀 並び替え</button>
             <button onclick="toggleChart()" class="sub-btn" style="color:#38a169">成績</button>
-            <button onclick="resetProgress()" class="sub-btn" style="color:#e53e3e">リセ</button>
+            <button onclick="resetProgress()" class="sub-btn" style="color:#e53e3e">リセット</button>
         </div>
     </div>
 
@@ -83,8 +91,8 @@
 
 <script>
     const SAVE_KEY = 'g_kentei_v_final_shuffle';
-    let rawData = [];      // 元データ（JSONそのまま）
-    let activeQuizList = []; // 現在の出題順リスト
+    let rawData = [];
+    let activeQuizList = [];
     let currentIdx = 0;
     let correctCount = 0;
     let answeredCount = 0;
@@ -97,7 +105,7 @@
         .then(res => res.json())
         .then(data => {
             rawData = data;
-            activeQuizList = [...data]; // 最初はそのままの順序
+            activeQuizList = [...data];
             document.getElementById('total-count').innerText = activeQuizList.length;
             
             const select = document.getElementById('category-jump');
@@ -111,7 +119,6 @@
             select.onchange = (e) => { 
                 if(e.target.value !== "") {
                     isReviewMode = false;
-                    // 指定カテゴリのみを抽出
                     activeQuizList = rawData.filter(item => item.Category === e.target.value);
                     currentIdx = 0;
                     show();
@@ -121,7 +128,6 @@
             show();
         });
 
-    // シャッフル関数 (Fisher-Yates)
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -130,14 +136,11 @@
         return array;
     }
 
-    // 「並び替え」ボタンクリック時の処理
     function shuffleRemaining() {
         if (isReviewMode) {
-            // 復習リストをシャッフル
             shuffleArray(wrongList);
             reviewIdx = 0;
         } else {
-            // 現在の出題リストの「これから解く分」をシャッフル
             const done = activeQuizList.slice(0, currentIdx);
             const remaining = activeQuizList.slice(currentIdx);
             activeQuizList = done.concat(shuffleArray(remaining));
@@ -214,7 +217,6 @@
         if(wrongList.length === 0) return;
         isReviewMode = true;
         reviewIdx = 0;
-        // 復習開始時に自動でシャッフル
         shuffleArray(wrongList);
         document.getElementById('result-ui').style.display = 'none';
         document.getElementById('quiz-ui').style.display = 'block';
