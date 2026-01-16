@@ -11,6 +11,7 @@
             --primary-light: #eff6ff;
             --danger-color: #dc2626;
             --success-color: #16a34a;
+            --warning-color: #f59e0b;
             --bg-color: #f1f5f9;
             --text-main: #1e293b;
             --text-sub: #64748b;
@@ -20,185 +21,62 @@
         body { 
             font-family: "Inter", "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif; 
             background-color: var(--bg-color); 
-            margin: 0; 
-            padding: 0;
-            display: flex; 
-            justify-content: center;
-            min-height: 100vh;
-            color: var(--text-main);
+            margin: 0; padding: 0;
+            display: flex; justify-content: center;
+            min-height: 100vh; color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
-        /* コンテナ設計：スマホではフル、PCでは最大640px */
-        .app-container {
-            width: 100%;
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 16px;
-            box-sizing: border-box;
-        }
+        .app-container { width: 100%; max-width: 640px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+        .card { background: white; padding: clamp(20px, 6vw, 40px); border-radius: 28px; box-shadow: var(--card-shadow); box-sizing: border-box; width: 100%; }
 
-        .card { 
-            background: white; 
-            padding: clamp(20px, 6vw, 40px); 
-            border-radius: 28px; 
-            box-shadow: var(--card-shadow);
-            box-sizing: border-box;
-            width: 100%;
-        }
-
-        /* --- ヘッダー --- */
-        .app-title { 
-            font-size: 1.5rem; 
-            font-weight: 800; 
-            margin-bottom: 8px; 
-            color: var(--text-main);
-            letter-spacing: -0.025em;
-        }
-
-        .data-status { 
-            font-size: 0.85rem; 
-            margin: 10px 0; 
-            padding: 10px; 
-            border-radius: 12px;
-            text-align: center;
-        }
+        /* --- ホーム・スタッツ --- */
+        .app-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em; }
+        .data-status { font-size: 0.85rem; margin: 10px 0; padding: 10px; border-radius: 12px; text-align: center; }
         .status-loading { background: #fef3c7; color: #92400e; }
-
-        /* --- スタッツ表示 --- */
-        .stat-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 16px; 
-            margin: 24px 0;
-        }
-        .stat-item { 
-            background: var(--primary-light); 
-            padding: 16px; 
-            border-radius: 20px;
-            text-align: center;
-        }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+        .stat-item { background: var(--primary-light); padding: 16px; border-radius: 20px; text-align: center; }
         .stat-label { font-size: 0.75rem; color: var(--text-sub); display: block; margin-bottom: 4px; font-weight: 600; }
         .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
 
-        /* --- ボタン共通 --- */
+        /* --- ボタン --- */
         .menu-btn { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 100%; 
-            padding: 16px; 
-            margin-bottom: 14px; 
-            border-radius: 16px; 
-            font-size: 1rem; 
-            font-weight: 700; 
-            border: none; 
-            cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none; 
-            box-sizing: border-box;
-            gap: 8px;
+            display: flex; align-items: center; justify-content: center; width: 100%; 
+            padding: 16px; margin-bottom: 14px; border-radius: 16px; font-size: 1rem; 
+            font-weight: 700; border: none; cursor: pointer; transition: 0.2s;
+            text-decoration: none; box-sizing: border-box; gap: 8px;
         }
-        .menu-btn:active { transform: scale(0.98); }
-
         .btn-main { background: var(--primary-color); color: white; }
-        .btn-main:hover { background: #1d4ed8; }
         .btn-sub { background: #f1f5f9; color: var(--text-main); }
         .btn-outline { background: white; border: 2px solid #e2e8f0; color: var(--text-main); }
-        .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
         .btn-info { background: #f8fafc; color: var(--text-sub); font-size: 0.8rem; border: 1px solid #e2e8f0; }
 
-        /* --- クイズ画面レイアウト --- */
+        /* --- クイズ画面 --- */
         #quiz-page { display: none; }
-        .nav-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            padding-bottom: 15px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        
-        #current-count { font-variant-numeric: tabular-nums; }
-
-        .category-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: var(--primary-light);
-            color: var(--primary-color);
-            border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .q-text { 
-            font-size: 1.15rem; 
-            font-weight: 700; 
-            margin-bottom: 24px; 
-            line-height: 1.6; 
-            color: var(--text-main);
-        }
-
-        /* 選択肢ボタン：文字が溢れないように */
-        .opt-btn { 
-            display: block; 
-            width: 100%; 
-            padding: 16px 20px; 
-            margin-bottom: 12px; 
-            border: 2px solid #f1f5f9; 
-            border-radius: 16px; 
-            background: #fff; 
-            text-align: left; 
-            font-size: 0.95rem; 
-            line-height: 1.4;
-            cursor: pointer;
-            transition: 0.2s;
-            color: var(--text-main);
-            word-wrap: break-word;
-        }
-        .opt-btn:hover:not(:disabled) { border-color: var(--primary-color); background: var(--primary-light); }
-        
-        /* 結果エリア */
-        .res-area { 
-            margin-top: 24px; 
-            padding: 20px; 
-            border-radius: 20px; 
-            display: none; 
-            line-height: 1.6; 
-            font-size: 0.95rem;
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f1f5f9; }
+        #category-jump { appearance: none; width: 100%; padding: 12px 16px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.9rem; cursor: pointer; }
+        .category-badge { display: inline-block; padding: 4px 12px; background: var(--primary-light); color: var(--primary-color); border-radius: 99px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
+        .q-text { font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; line-height: 1.6; }
+        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid #f1f5f9; border-radius: 16px; background: #fff; text-align: left; font-size: 0.95rem; cursor: pointer; word-wrap: break-word; }
+        .res-area { margin-top: 24px; padding: 20px; border-radius: 20px; display: none; line-height: 1.6; animation: slideIn 0.3s; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         .correct { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; }
         .wrong { background: #fef2f2; color: #991b1b; border: 1px solid #ef4444; }
-        
-        /* 検索ボタン */
         .search-area { margin-top: 15px; display: grid; gap: 10px; }
-        .search-btn { 
-            display: flex; align-items: center; justify-content: center; 
-            padding: 12px; background: white; color: var(--text-sub); border: 1px solid #e2e8f0;
-            text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem;
-        }
+        .search-btn { display: flex; align-items: center; justify-content: center; padding: 12px; background: white; border: 1px solid #e2e8f0; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem; }
 
-        /* --- モーダル（成績分析） --- */
+        /* --- モーダル（判定機能追加） --- */
         #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:1000; justify-content:center; align-items:center; padding:20px; backdrop-filter: blur(4px); }
         .chart-modal { background:white; padding:30px; border-radius:32px; width:100%; max-width:400px; text-align:center; box-sizing: border-box; }
-
-        /* カテゴリ選択セレクトボックスの改善 */
-        #category-jump {
-            appearance: none;
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            cursor: pointer;
+        
+        .judgment-box { 
+            margin-top: 20px; padding: 15px; border-radius: 16px; 
+            font-weight: 800; font-size: 1.1rem; 
         }
+        .judgment-pass { background: #ecfdf5; color: var(--success-color); border: 2px solid var(--success-color); }
+        .judgment-warn { background: #fffbeb; color: var(--warning-color); border: 2px solid var(--warning-color); }
+        .judgment-fail { background: #fef2f2; color: var(--danger-color); border: 2px solid var(--danger-color); }
+        .judgment-desc { font-size: 0.75rem; font-weight: normal; margin-top: 5px; color: var(--text-sub); }
     </style>
 </head>
 <body>
@@ -208,37 +86,26 @@
         <div id="home-page">
             <div class="app-title">G検定 学習アプリ Pro</div>
             <div id="data-status" class="data-status status-loading">データを読み込み中...</div>
-            
             <div class="stat-grid">
                 <div class="stat-item"><span class="stat-label">学習進捗</span><span class="stat-value" id="stat-progress">0%</span></div>
                 <div class="stat-item"><span class="stat-label">平均正解率</span><span class="stat-value" id="stat-accuracy">0%</span></div>
             </div>
-
             <button onclick="startQuiz(false)" class="menu-btn btn-main" id="continue-btn">🚀 学習を開始する</button>
             <button onclick="startQuiz(true)" class="menu-btn btn-sub">↩️ 進捗をリセット</button>
             <button onclick="toggleChart()" class="menu-btn btn-outline">📊 成績を詳細分析</button>
-            
-            <a href="https://www.jdla.org/certificate/general/" target="_blank" class="menu-btn btn-info">
-                🌐 JDLA公式サイトを確認
-            </a>
+            <a href="https://www.jdla.org/certificate/general/" target="_blank" class="menu-btn btn-info">🌐 JDLA公式サイト</a>
         </div>
 
         <div id="quiz-page">
             <div class="nav-header">
-                <button onclick="goHome()" style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:8px 14px; cursor:pointer; font-size:1.2rem;">🏠</button>
-                <div style="font-weight:700; color:var(--text-sub); font-size: 0.9rem;">
-                    PROGRESS: <span id="current-count" style="color:var(--primary-color)">0</span> / <span id="total-count">0</span>
-                </div>
-                <button onclick="shuffleRemaining()" style="background:#f1f5f9; border:none; padding:10px 14px; border-radius:12px; cursor:pointer; font-size:1.1rem;">🔀</button>
+                <button onclick="goHome()" style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:8px 14px; cursor:pointer;">🏠</button>
+                <div style="font-weight:700; color:var(--text-sub); font-size: 0.9rem;">Q <span id="current-count" style="color:var(--primary-color)">0</span> / <span id="total-count">0</span></div>
+                <button onclick="shuffleRemaining()" style="background:#f1f5f9; border:none; padding:10px 14px; border-radius:12px; cursor:pointer;">🔀</button>
             </div>
-
             <select id="category-jump"></select>
-            
             <div id="display-id" class="category-badge"></div>
             <div id="display-text" class="q-text"></div>
-            
             <div id="options-area"></div>
-            
             <div id="display-result" class="res-area"></div>
             <button id="next-btn" class="menu-btn btn-main" style="display:none; margin-top:20px;">次の問題へ ➔</button>
         </div>
@@ -247,17 +114,20 @@
 
 <div id="chart-overlay" onclick="toggleChart()">
     <div class="chart-modal" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0; margin-bottom:20px; font-size: 1.25rem;">現在の学習状況</h3>
-        <div style="max-width: 250px; margin: 0 auto;">
+        <h3 style="margin-top:0; margin-bottom:15px;">現在の合格判定</h3>
+        <div style="max-width: 180px; margin: 0 auto;">
             <canvas id="accuracyChart"></canvas>
         </div>
-        <div id="chart-detail-text" style="margin:20px 0; font-weight:700; color:var(--text-main); font-size: 1.1rem;"></div>
+        
+        <div id="judgment-result" class="judgment-box">
+            </div>
+
+        <div id="chart-detail-text" style="margin:15px 0; font-weight:700; color:var(--text-main);"></div>
         <button onclick="toggleChart()" class="menu-btn btn-sub" style="margin-bottom:0;">閉じる</button>
     </div>
 </div>
 
 <script>
-    // --- ロジック部分は提供されたものと同一 ---
     const SAVE_KEY = 'g_kentei_v_pro_final_v2';
     let rawData = [], activeQuizList = [], currentIdx = 0, correctCount = 0, answeredCount = 0;
     let categoryStats = {}, myChart = null;
@@ -269,9 +139,7 @@
             document.getElementById('data-status').style.display = 'none';
             initCategoryMenu(); load(); updateHomeStats();
         })
-        .catch(err => {
-            document.getElementById('data-status').innerText = "⚠️ quizData.json が見つかりません。";
-        });
+        .catch(err => { document.getElementById('data-status').innerText = "⚠️ データが見つかりません。"; });
 
     function initCategoryMenu() {
         const select = document.getElementById('category-jump');
@@ -297,7 +165,7 @@
 
     function startQuiz(reset) {
         if(rawData.length === 0) return;
-        if(reset && confirm("これまでの進捗をリセットしてもよろしいですか？")) {
+        if(reset && confirm("進捗をリセットしますか？")) {
             currentIdx = 0; correctCount = 0; answeredCount = 0; categoryStats = {};
             activeQuizList = [...rawData]; save();
         }
@@ -312,28 +180,21 @@
     function show() {
         const item = activeQuizList[currentIdx];
         if (!item) return goHome();
-        
         document.getElementById('current-count').innerText = currentIdx + 1;
         document.getElementById('display-id').innerText = `${item.ID} | ${item.Category}`;
         document.getElementById('display-text').innerText = item.Question;
         document.getElementById('display-result').style.display = 'none';
         document.getElementById('next-btn').style.display = 'none';
-        
-        const area = document.getElementById('options-area'); 
-        area.innerHTML = '';
-
+        const area = document.getElementById('options-area'); area.innerHTML = '';
         const originalOpts = [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
         let shuffleList = originalOpts.map((text, index) => ({ text: text, isCorrect: (index === item.Answer_Idx) }));
-
         for (let i = shuffleList.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffleList[i], shuffleList[j]] = [shuffleList[j], shuffleList[i]];
         }
-
         shuffleList.forEach((optObj) => {
             const b = document.createElement('button');
-            b.className = 'opt-btn';
-            b.innerText = optObj.text;
+            b.className = 'opt-btn'; b.innerText = optObj.text;
             b.onclick = () => checkResult(optObj.isCorrect, optObj.text, item);
             area.appendChild(b);
         });
@@ -344,29 +205,18 @@
         document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
         const opts = [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
         const correctText = opts[item.Answer_Idx];
-
         if (!categoryStats[item.Category]) categoryStats[item.Category] = { correct: 0, total: 0 };
         categoryStats[item.Category].total++;
-
         if (isCorrect) {
             correctCount++; categoryStats[item.Category].correct++;
-            res.className = 'res-area correct'; res.innerHTML = `<div><b>✨ 正解です！</b></div><div style="margin-top:8px; font-size:0.9rem;">${item.Explanation}</div>`;
+            res.className = 'res-area correct'; res.innerHTML = `<div><b>✨ 正解です！</b></div><div style="margin-top:8px; font-size:0.85rem;">${item.Explanation}</div>`;
         } else {
-            res.className = 'res-area wrong'; res.innerHTML = `<div><b>❌ 不正解...</b></div><div style="margin-top:4px;">正解: <b>${correctText}</b></div><div style="margin-top:8px; font-size:0.9rem;">${item.Explanation}</div>`;
+            res.className = 'res-area wrong'; res.innerHTML = `<div><b>❌ 不正解...</b></div><div style="margin-top:4px;">正解: <b>${correctText}</b></div><div style="margin-top:8px; font-size:0.85rem;">${item.Explanation}</div>`;
         }
-
-        let searchAreaHtml = `<div class="search-area">`;
-        const correctQuery = `G検定 "${correctText}"`;
-        searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(correctQuery)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--success-color);">🔍 正解「${correctText}」を検索</a>`;
-        
-        if (!isCorrect) {
-            const wrongQuery = `G検定 "${chosenText}"`;
-            searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(wrongQuery)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--danger-color);">🔍 選んだ「${chosenText}」を検索</a>`;
-        }
-        
-        searchAreaHtml += `</div>`;
-        res.innerHTML += searchAreaHtml;
-        
+        let sArea = `<div class="search-area">`;
+        sArea += `<a href="https://www.google.com/search?q=${encodeURIComponent('G検定 '+correctText)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--success-color);">🔍 「${correctText}」を検索</a>`;
+        if (!isCorrect) sArea += `<a href="https://www.google.com/search?q=${encodeURIComponent('G検定 '+chosenText)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--danger-color);">🔍 選んだ用語を検索</a>`;
+        res.innerHTML += sArea + `</div>`;
         answeredCount++; res.style.display = 'block'; 
         document.getElementById('next-btn').style.display = 'flex';
         save();
@@ -374,28 +224,45 @@
 
     document.getElementById('next-btn').onclick = () => { currentIdx++; show(); };
 
+    // --- 改修：合格判定ロジック ---
     function toggleChart() {
         const o = document.getElementById('chart-overlay');
         o.style.display = (o.style.display === 'flex') ? 'none' : 'flex';
         if (o.style.display === 'flex') {
+            const accuracy = answeredCount > 0 ? (correctCount / answeredCount) * 100 : 0;
+            const judgeBox = document.getElementById('judgment-result');
+            
+            // 判定ロジック
+            if (answeredCount < 10) {
+                judgeBox.className = "judgment-box judgment-warn";
+                judgeBox.innerHTML = `判定不能<div class="judgment-desc">精度向上のため、あと ${10 - answeredCount} 問解いてください</div>`;
+            } else if (accuracy >= 75) {
+                judgeBox.className = "judgment-box judgment-pass";
+                judgeBox.innerHTML = `🎉 合格圏内 (A判定)<div class="judgment-desc">この調子で本番に臨みましょう！</div>`;
+            } else if (accuracy >= 65) {
+                judgeBox.className = "judgment-box judgment-warn";
+                judgeBox.innerHTML = `⚡ 合格ライン付近 (B判定)<div class="judgment-desc">苦手分野を重点的に復習しましょう</div>`;
+            } else {
+                judgeBox.className = "judgment-box judgment-fail";
+                judgeBox.innerHTML = `📢 努力圏 (C判定)<div class="judgment-desc">正解率70%以上を目指して反復学習を！</div>`;
+            }
+
             const ctx = document.getElementById('accuracyChart').getContext('2d');
             if(myChart) myChart.destroy();
-            document.getElementById('chart-detail-text').innerText = `${correctCount} / ${answeredCount} 正解`;
+            document.getElementById('chart-detail-text').innerText = `正解率: ${Math.round(accuracy)}% (${correctCount}/${answeredCount})`;
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: { labels: ['正解', '不正解'], datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#16a34a', '#dc2626'], borderWeight: 0 }] },
-                options: { cutout: '70%', plugins: { legend: { display: false } } }
+                options: { cutout: '75%', plugins: { legend: { display: false } } }
             });
         }
     }
 
     function shuffleRemaining() {
         const rem = activeQuizList.slice(currentIdx);
-        for(let i=rem.length-1; i>0; i--){
-            const j=Math.floor(Math.random()*(i+1)); [rem[i], rem[j]]=[rem[j], rem[i]];
-        }
+        for(let i=rem.length-1; i>0; i--){ const j=Math.floor(Math.random()*(i+1)); [rem[i], rem[j]]=[rem[j], rem[i]]; }
         activeQuizList = activeQuizList.slice(0, currentIdx).concat(rem);
-        alert("残りの問題をシャッフルしました"); show();
+        alert("シャッフルしました"); show();
     }
 
     function save() { localStorage.setItem(SAVE_KEY, JSON.stringify({ i: currentIdx, c: correctCount, a: answeredCount, cat: categoryStats })); }
