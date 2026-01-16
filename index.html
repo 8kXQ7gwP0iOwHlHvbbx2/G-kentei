@@ -7,118 +7,257 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #1a73e8;
-            --danger-color: #e53e3e;
-            --success-color: #38a169;
-            --bg-color: #f8f9fa;
+            --primary-color: #2563eb;
+            --primary-light: #eff6ff;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+            --bg-color: #f1f5f9;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
         body { 
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; 
-            background: var(--bg-color); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; color: #333;
+            font-family: "Inter", "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif; 
+            background-color: var(--bg-color); 
+            margin: 0; 
+            padding: 0;
+            display: flex; 
+            justify-content: center;
+            min-height: 100vh;
+            color: var(--text-main);
             -webkit-font-smoothing: antialiased;
         }
 
+        /* コンテナ設計：スマホではフル、PCでは最大640px */
+        .app-container {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
         .card { 
-            background: white; max-width: 600px; width: 100%; padding: clamp(15px, 5vw, 25px); 
-            border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); box-sizing: border-box; margin-top: 10px;
+            background: white; 
+            padding: clamp(20px, 6vw, 40px); 
+            border-radius: 28px; 
+            box-shadow: var(--card-shadow);
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        /* --- 表紙ページ --- */
-        #home-page { text-align: center; }
-        .app-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 5px; color: #222; }
-        .data-status { font-size: 0.8rem; margin: 10px 0; padding: 5px; border-radius: 5px; }
-        .status-loading { background: #fff3cd; color: #856404; }
+        /* --- ヘッダー --- */
+        .app-title { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+        }
 
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; margin-top: 20px; }
-        .stat-item { background: #f1f3f4; padding: 15px; border-radius: 15px; }
-        .stat-label { font-size: 0.75rem; color: #666; display: block; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+        .data-status { 
+            font-size: 0.85rem; 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 12px;
+            text-align: center;
+        }
+        .status-loading { background: #fef3c7; color: #92400e; }
 
+        /* --- スタッツ表示 --- */
+        .stat-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 16px; 
+            margin: 24px 0;
+        }
+        .stat-item { 
+            background: var(--primary-light); 
+            padding: 16px; 
+            border-radius: 20px;
+            text-align: center;
+        }
+        .stat-label { font-size: 0.75rem; color: var(--text-sub); display: block; margin-bottom: 4px; font-weight: 600; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
+
+        /* --- ボタン共通 --- */
         .menu-btn { 
-            display: flex; align-items: center; justify-content: center; width: 100%; 
-            padding: 16px; margin-bottom: 12px; border-radius: 15px; font-size: 1rem; 
-            font-weight: bold; border: none; cursor: pointer; transition: 0.2s;
-            text-decoration: none; box-sizing: border-box;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+            padding: 16px; 
+            margin-bottom: 14px; 
+            border-radius: 16px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none; 
+            box-sizing: border-box;
+            gap: 8px;
         }
-        .btn-main { background: var(--primary-color); color: white; }
-        .btn-sub { background: white; border: 2px solid #eee; color: #444; }
-        .btn-outline { background: #fff; border: 2px solid var(--primary-color); color: var(--primary-color); }
-        .btn-info { background: #e8f0fe; color: var(--primary-color); font-size: 0.85rem; }
+        .menu-btn:active { transform: scale(0.98); }
 
-        /* --- クイズ画面 --- */
+        .btn-main { background: var(--primary-color); color: white; }
+        .btn-main:hover { background: #1d4ed8; }
+        .btn-sub { background: #f1f5f9; color: var(--text-main); }
+        .btn-outline { background: white; border: 2px solid #e2e8f0; color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .btn-info { background: #f8fafc; color: var(--text-sub); font-size: 0.8rem; border: 1px solid #e2e8f0; }
+
+        /* --- クイズ画面レイアウト --- */
         #quiz-page { display: none; }
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .q-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 25px; line-height: 1.6; word-wrap: break-word; }
-        .opt-btn { 
-            display: block; width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #eee; 
-            border-radius: 12px; background: #fff; text-align: left; font-size: 1rem; cursor: pointer;
+        .nav-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f1f5f9;
         }
         
-        .res-area { margin-top: 20px; padding: 20px; border-radius: 12px; display: none; line-height: 1.6; border-left: 6px solid; font-size: 0.95rem; }
-        .correct { background: #f0fff4; color: #22543d; border-color: var(--success-color); }
-        .wrong { background: #fff5f5; color: #822727; border-color: var(--danger-color); }
+        #current-count { font-variant-numeric: tabular-nums; }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .q-text { 
+            font-size: 1.15rem; 
+            font-weight: 700; 
+            margin-bottom: 24px; 
+            line-height: 1.6; 
+            color: var(--text-main);
+        }
+
+        /* 選択肢ボタン：文字が溢れないように */
+        .opt-btn { 
+            display: block; 
+            width: 100%; 
+            padding: 16px 20px; 
+            margin-bottom: 12px; 
+            border: 2px solid #f1f5f9; 
+            border-radius: 16px; 
+            background: #fff; 
+            text-align: left; 
+            font-size: 0.95rem; 
+            line-height: 1.4;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-main);
+            word-wrap: break-word;
+        }
+        .opt-btn:hover:not(:disabled) { border-color: var(--primary-color); background: var(--primary-light); }
         
-        .search-area { margin-top: 15px; display: flex; flex-direction: column; gap: 8px; }
+        /* 結果エリア */
+        .res-area { 
+            margin-top: 24px; 
+            padding: 20px; 
+            border-radius: 20px; 
+            display: none; 
+            line-height: 1.6; 
+            font-size: 0.95rem;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .correct { background: #ecfdf5; color: #065f46; border: 1px solid #10b981; }
+        .wrong { background: #fef2f2; color: #991b1b; border: 1px solid #ef4444; }
+        
+        /* 検索ボタン */
+        .search-area { margin-top: 15px; display: grid; gap: 10px; }
         .search-btn { 
             display: flex; align-items: center; justify-content: center; 
-            padding: 12px; background: #fff; color: #5f6368; border: 1px solid #dfe1e5;
-            text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 0.85rem;
-            transition: 0.2s;
+            padding: 12px; background: white; color: var(--text-sub); border: 1px solid #e2e8f0;
+            text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 0.85rem;
         }
-        .search-btn:hover { background: #f8f9fa; }
 
-        /* --- モーダル --- */
-        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; padding:15px; }
-        .chart-modal { background:white; padding:25px; border-radius:24px; width:100%; max-width:450px; text-align:center; box-sizing: border-box; }
+        /* --- モーダル（成績分析） --- */
+        #chart-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:1000; justify-content:center; align-items:center; padding:20px; backdrop-filter: blur(4px); }
+        .chart-modal { background:white; padding:30px; border-radius:32px; width:100%; max-width:400px; text-align:center; box-sizing: border-box; }
+
+        /* カテゴリ選択セレクトボックスの改善 */
+        #category-jump {
+            appearance: none;
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div id="home-page">
-        <div class="app-title">G検定 学習アプリ Pro</div>
-        <div id="data-status" class="data-status status-loading">quizData.json を読み込み中...</div>
-        
-        <div class="stat-grid">
-            <div class="stat-item"><span class="stat-label">学習進捗</span><span class="stat-value" id="stat-progress">0%</span></div>
-            <div class="stat-item"><span class="stat-label">平均正解率</span><span class="stat-value" id="stat-accuracy">0%</span></div>
+<div class="app-container">
+    <div class="card">
+        <div id="home-page">
+            <div class="app-title">G検定 学習アプリ Pro</div>
+            <div id="data-status" class="data-status status-loading">データを読み込み中...</div>
+            
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">学習進捗</span><span class="stat-value" id="stat-progress">0%</span></div>
+                <div class="stat-item"><span class="stat-label">平均正解率</span><span class="stat-value" id="stat-accuracy">0%</span></div>
+            </div>
+
+            <button onclick="startQuiz(false)" class="menu-btn btn-main" id="continue-btn">🚀 学習を開始する</button>
+            <button onclick="startQuiz(true)" class="menu-btn btn-sub">↩️ 進捗をリセット</button>
+            <button onclick="toggleChart()" class="menu-btn btn-outline">📊 成績を詳細分析</button>
+            
+            <a href="https://www.jdla.org/certificate/general/" target="_blank" class="menu-btn btn-info">
+                🌐 JDLA公式サイトを確認
+            </a>
         </div>
 
-        <button onclick="startQuiz(true)" class="menu-btn btn-sub">↩️ 最初から解く</button>
-        <button onclick="startQuiz(false)" class="menu-btn btn-main" id="continue-btn">🚀 学習を再開する</button>
-        <button onclick="toggleChart()" class="menu-btn btn-outline">📊 成績を詳細分析</button>
-        
-        <a href="https://www.jdla.org/certificate/general/" target="_blank" class="menu-btn btn-info">
-            🌐 G検定 最新情報を確認 (JDLA公式)
-        </a>
-    </div>
+        <div id="quiz-page">
+            <div class="nav-header">
+                <button onclick="goHome()" style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:8px 14px; cursor:pointer; font-size:1.2rem;">🏠</button>
+                <div style="font-weight:700; color:var(--text-sub); font-size: 0.9rem;">
+                    PROGRESS: <span id="current-count" style="color:var(--primary-color)">0</span> / <span id="total-count">0</span>
+                </div>
+                <button onclick="shuffleRemaining()" style="background:#f1f5f9; border:none; padding:10px 14px; border-radius:12px; cursor:pointer; font-size:1.1rem;">🔀</button>
+            </div>
 
-    <div id="quiz-page">
-        <div class="nav-header">
-            <button onclick="goHome()" style="background:none; border:1px solid #ddd; border-radius:8px; padding:5px 12px; cursor:pointer;">🏠</button>
-            <div style="font-weight:bold; color:#666;">Q <span id="current-count">0</span> / <span id="total-count">0</span></div>
-            <button onclick="shuffleRemaining()" style="background:#f0f0f0; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">🔀</button>
+            <select id="category-jump"></select>
+            
+            <div id="display-id" class="category-badge"></div>
+            <div id="display-text" class="q-text"></div>
+            
+            <div id="options-area"></div>
+            
+            <div id="display-result" class="res-area"></div>
+            <button id="next-btn" class="menu-btn btn-main" style="display:none; margin-top:20px;">次の問題へ ➔</button>
         </div>
-        <select id="category-jump" style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid #ddd;"></select>
-        <div id="display-id" style="font-size:0.75rem; color:var(--primary-color); font-weight:bold; margin-bottom:5px;"></div>
-        <div id="display-text" class="q-text"></div>
-        <div id="options-area"></div>
-        <div id="display-result" class="res-area"></div>
-        <button id="next-btn" class="menu-btn btn-main" style="display:none; margin-top:15px;">次の問題へ</button>
     </div>
 </div>
 
 <div id="chart-overlay" onclick="toggleChart()">
     <div class="chart-modal" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0;">学習状況分析</h3>
-        <canvas id="accuracyChart"></canvas>
-        <div id="chart-detail-text" style="margin-top:15px; font-weight:bold; color:#555;"></div>
-        <button onclick="toggleChart()" class="menu-btn" style="background:#666; color:white; margin-top:20px;">閉じる</button>
+        <h3 style="margin-top:0; margin-bottom:20px; font-size: 1.25rem;">現在の学習状況</h3>
+        <div style="max-width: 250px; margin: 0 auto;">
+            <canvas id="accuracyChart"></canvas>
+        </div>
+        <div id="chart-detail-text" style="margin:20px 0; font-weight:700; color:var(--text-main); font-size: 1.1rem;"></div>
+        <button onclick="toggleChart()" class="menu-btn btn-sub" style="margin-bottom:0;">閉じる</button>
     </div>
 </div>
 
 <script>
+    // --- ロジック部分は提供されたものと同一 ---
     const SAVE_KEY = 'g_kentei_v_pro_final_v2';
     let rawData = [], activeQuizList = [], currentIdx = 0, correctCount = 0, answeredCount = 0;
     let categoryStats = {}, myChart = null;
@@ -136,7 +275,7 @@
 
     function initCategoryMenu() {
         const select = document.getElementById('category-jump');
-        select.innerHTML = '<option value="">▼ カテゴリから選ぶ</option>';
+        select.innerHTML = '<option value="">▼ カテゴリを絞り込む</option>';
         [...new Set(rawData.map(i => i.Category))].forEach(cat => {
             const opt = document.createElement('option'); opt.value = cat; opt.innerText = cat; select.appendChild(opt);
         });
@@ -158,7 +297,7 @@
 
     function startQuiz(reset) {
         if(rawData.length === 0) return;
-        if(reset && confirm("進捗をリセットしますか？")) {
+        if(reset && confirm("これまでの進捗をリセットしてもよろしいですか？")) {
             currentIdx = 0; correctCount = 0; answeredCount = 0; categoryStats = {};
             activeQuizList = [...rawData]; save();
         }
@@ -186,7 +325,6 @@
         const originalOpts = [item.Opt1, item.Opt2, item.Opt3, item.Opt4, item.Opt5, item.Opt6].filter(v => v);
         let shuffleList = originalOpts.map((text, index) => ({ text: text, isCorrect: (index === item.Answer_Idx) }));
 
-        // 選択肢シャッフル
         for (let i = shuffleList.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffleList[i], shuffleList[j]] = [shuffleList[j], shuffleList[i]];
@@ -212,29 +350,25 @@
 
         if (isCorrect) {
             correctCount++; categoryStats[item.Category].correct++;
-            res.className = 'res-area correct'; res.innerHTML = `<b>✨ 正解です！</b><br>${item.Explanation}`;
+            res.className = 'res-area correct'; res.innerHTML = `<div><b>✨ 正解です！</b></div><div style="margin-top:8px; font-size:0.9rem;">${item.Explanation}</div>`;
         } else {
-            res.className = 'res-area wrong'; res.innerHTML = `<b>❌ 不正解...</b> (正解: ${correctText})<br>${item.Explanation}`;
+            res.className = 'res-area wrong'; res.innerHTML = `<div><b>❌ 不正解...</b></div><div style="margin-top:4px;">正解: <b>${correctText}</b></div><div style="margin-top:8px; font-size:0.9rem;">${item.Explanation}</div>`;
         }
 
-        // --- 検索ボタンエリア ---
         let searchAreaHtml = `<div class="search-area">`;
-        
-        // 正解の検索（緑の枠線）
         const correctQuery = `G検定 "${correctText}"`;
-        searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(correctQuery)}" target="_blank" class="search-btn" style="border-left: 5px solid var(--success-color);">🔍 正解「${correctText}」を検索</a>`;
+        searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(correctQuery)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--success-color);">🔍 正解「${correctText}」を検索</a>`;
         
-        // 誤答を選んだ場合、その用語も検索（赤の枠線）
         if (!isCorrect) {
             const wrongQuery = `G検定 "${chosenText}"`;
-            searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(wrongQuery)}" target="_blank" class="search-btn" style="border-left: 5px solid var(--danger-color); background:#fffafb;">🔍 選んだ「${chosenText}」を検索</a>`;
+            searchAreaHtml += `<a href="https://www.google.com/search?q=${encodeURIComponent(wrongQuery)}" target="_blank" class="search-btn" style="border-left: 4px solid var(--danger-color);">🔍 選んだ「${chosenText}」を検索</a>`;
         }
         
         searchAreaHtml += `</div>`;
         res.innerHTML += searchAreaHtml;
         
         answeredCount++; res.style.display = 'block'; 
-        document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'flex';
         save();
     }
 
@@ -246,10 +380,11 @@
         if (o.style.display === 'flex') {
             const ctx = document.getElementById('accuracyChart').getContext('2d');
             if(myChart) myChart.destroy();
-            document.getElementById('chart-detail-text').innerText = `正解数: ${correctCount} / 回答数: ${answeredCount}`;
+            document.getElementById('chart-detail-text').innerText = `${correctCount} / ${answeredCount} 正解`;
             myChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['正解', '不正解'], datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#38a169', '#e53e3e'] }] }
+                data: { labels: ['正解', '不正解'], datasets: [{ data: [correctCount, answeredCount - correctCount], backgroundColor: ['#16a34a', '#dc2626'], borderWeight: 0 }] },
+                options: { cutout: '70%', plugins: { legend: { display: false } } }
             });
         }
     }
